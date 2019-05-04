@@ -11,25 +11,28 @@ fn main() {
         .exit_on_esc(true)
         .build()
         .unwrap();
-
-    let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-    render(&mut buf);
-
-    let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
-    let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
+    let mut offset = 0.0;
 
     while let Some(event) = window.next() {
+        
+        let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
+        render(&mut buf,offset);
+
+        let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+        let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
+        //println!("Bin ich Dooooof?");
         window.draw_2d(&event, |context, graphics| {
-            clear([1.0, 0.0, 0.5, 1.0], graphics);
+            //clear([1.0, 0.0, 0.5, 1.0], graphics);
             image(&texture, context.transform, graphics)
         });
+        offset += 0.05;
     }
 }
-fn render(img: &mut [u8]) {
-    let lower_left_corner = Vec3::new(-2.0, -1.5, -1.0);
+fn render(img: &mut [u8],offset: f64) {
+    let lower_left_corner = Vec3::new(-2.0- offset, -1.5, -1.0);
     let horizontal = Vec3::new(4.0, 0.0, 0.0);
     let vertical = Vec3::new(0.0, 3.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
+    let origin = Vec3::new(0.0 - offset, 0.0, 0.0);
     for x in 0..W {
         for y in 0..H {
             let u = (x as f64 / W as f64);
