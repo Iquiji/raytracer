@@ -44,7 +44,8 @@ impl Vec3 {
         self.e[0] * f.e[1]- self.e[1] * f.e[0])
     }
     fn unit_vector(&self) -> Self{
-        self / self.len()
+        let f = self.len();
+        Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
 }
 
