@@ -35,15 +35,17 @@ impl Vec3 {
         let k = 1.0 / self.len();
         *self *= k;
     }
-    pub fn dot(&self,f:Vec3)-> f64{
-        self.e[0] * f.e[0]+ self.e[1] * f.e[1]+ self.e[2] * f.e[2]
+    pub fn dot(&self, f: Vec3) -> f64 {
+        self.e[0] * f.e[0] + self.e[1] * f.e[1] + self.e[2] * f.e[2]
     }
-    pub fn cross(&self,f: Vec3) -> Vec3{
-        Self::new(self.e[1] * f.e[2]- self.e[2] * f.e[1],
-        -self.e[0] * f.e[2]- self.e[2] * f.e[0],
-        self.e[0] * f.e[1]- self.e[1] * f.e[0])
+    pub fn cross(&self, f: Vec3) -> Vec3 {
+        Self::new(
+            self.e[1] * f.e[2] - self.e[2] * f.e[1],
+            -self.e[0] * f.e[2] - self.e[2] * f.e[0],
+            self.e[0] * f.e[1] - self.e[1] * f.e[0],
+        )
     }
-    pub fn unit_vector(&self) -> Self{
+    pub fn unit_vector(&self) -> Self {
         let f = self.len();
         Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
