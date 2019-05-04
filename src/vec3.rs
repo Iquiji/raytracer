@@ -4,46 +4,46 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    fn new(x: f64, y: f64, z: f64) -> Self {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { e: [x, y, z] }
     }
-    fn x(&self) -> f64 {
+    pub fn x(&self) -> f64 {
         self.e[0]
     }
-    fn y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.e[1]
     }
-    fn z(&self) -> f64 {
+    pub fn z(&self) -> f64 {
         self.e[2]
     }
-    fn r(&self) -> f64 {
+    pub fn r(&self) -> f64 {
         self.e[0]
     }
-    fn g(&self) -> f64 {
+    pub fn g(&self) -> f64 {
         self.e[1]
     }
-    fn b(&self) -> f64 {
+    pub fn b(&self) -> f64 {
         self.e[2]
     }
-    fn len(&self) -> f64 {
+    pub fn len(&self) -> f64 {
         self.len_sq().sqrt()
     }
-    fn len_sq(&self) -> f64 {
+    pub fn len_sq(&self) -> f64 {
         self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
     }
-    fn make_unit_vector(&mut self) {
+    pub fn make_unit_vector(&mut self) {
         let k = 1.0 / self.len();
         *self *= k;
     }
-    fn dot(&self,f:Vec3)-> f64{
+    pub fn dot(&self,f:Vec3)-> f64{
         self.e[0] * f.e[0]+ self.e[1] * f.e[1]+ self.e[2] * f.e[2]
     }
-    fn cross(&self,f: Vec3) -> Vec3{
+    pub fn cross(&self,f: Vec3) -> Vec3{
         Self::new(self.e[1] * f.e[2]- self.e[2] * f.e[1],
         -self.e[0] * f.e[2]- self.e[2] * f.e[0],
         self.e[0] * f.e[1]- self.e[1] * f.e[0])
     }
-    fn unit_vector(&self) -> Self{
+    pub fn unit_vector(&self) -> Self{
         let f = self.len();
         Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
