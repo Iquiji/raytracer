@@ -1,7 +1,9 @@
 extern crate image as image_crate;
 mod vec3;
+mod ray;
 use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
 use vec3::Vec3;
+use ray::Ray;
 const W: usize = 640;
 const H: usize = 480;
 fn main() {
