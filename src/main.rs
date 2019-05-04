@@ -1,5 +1,7 @@
 extern crate image as image_crate;
+mod vec3;
 use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
+use vec3::Vec3;
 const W: usize = 640;
 const H: usize = 480;
 fn main() {
@@ -24,9 +26,9 @@ fn main() {
 fn render(img: &mut [u8]) {
     for x in 0..W {
         for y in 0..H {
-            img[(x+y*W) * 4] = (x as f64 / W as f64 * 255.0) as u8;
-            img[(x+y*W) * 4 + 1] = (y as f64 / H as f64 * 255.0) as u8;
-            img[(x+y*W) * 4 + 2] = 51 as u8;
+            img[(x + y * W) * 4] = (x as f64 / W as f64 * 255.0) as u8;
+            img[(x + y * W) * 4 + 1] = (y as f64 / H as f64 * 255.0) as u8;
+            img[(x + y * W) * 4 + 2] = 51 as u8;
         }
     }
 }
