@@ -61,9 +61,10 @@ fn render(img: &mut [u8]) {
     }
 }
 fn color(r: &Ray, world: &HitableList) -> Vec3 {
-    let rec: HitRecord = world.hit(&r, 0.0, std::f64::MAX).unwrap();
+    let rec  = world.hit(&r, 0.0, std::f64::MAX);
     match rec {
         HitRecord => {
+            let rec = rec.unwrap();
             return Vec3::new(
                 rec.normal.x() + 1.0,
                 rec.normal.y() + 1.0,

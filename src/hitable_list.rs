@@ -16,10 +16,15 @@ impl Hitable for HitableList {
         let mut hit_anything: bool = false;
         let mut closest_so_far: f64 = t_max;
         for i in 0..self.hitable.len() {
-            if let temp = self.hitable[i].hit(&r, t_min, closest_so_far).unwrap() {
-                hit_anything = true;
-                closest_so_far = temp.t;
-                rec = temp;
+            let temp = self.hitable[i].hit(&r, t_min, closest_so_far);
+            match temp {
+                HitRecord => {
+                    let temp = temp.unwrap();
+                    hit_anything = true;
+                    closest_so_far = temp.t;
+                    rec = temp;
+                }
+                _=> {}
             }
         }
         if hit_anything {
