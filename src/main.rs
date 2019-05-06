@@ -1,13 +1,16 @@
 extern crate image as image_crate;
 mod hitable;
+mod hitable_list;
 mod ray;
 mod sphere;
 mod vec3;
-mod hitable_list;
+use crate::hitable::Hitable;
+use hitable::{hitableEnum, HitRecord};
+use hitable_list::HitableList;
 use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
 use ray::Ray;
+use sphere::Sphere;
 use vec3::Vec3;
-use hitable_list::HitableList;
 const W: usize = 640;
 const H: usize = 480;
 fn main() {
@@ -34,37 +37,31 @@ fn render(img: &mut [u8]) {
     let horizontal = Vec3::new(4.0, 0.0, 0.0);
     let vertical = Vec3::new(0.0, 3.0, 0.0);
     let origin = Vec3::new(0.0, 0.0, 0.0);
+    let mut world: HitableList = HitableList{
+        hitable: vec![hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)),hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0))],
+    };
     for x in 0..W {
         for y in 0..H {
             let u = (x as f64 / W as f64);
             let v = (y as f64 / H as f64);
             let r = Ray::new(origin, lower_left_corner + horizontal * u + vertical * v);
-            let col = color(&r);
+            let col = color(&r, &world);
             img[(x + y * W) * 4 + 0] = (255.0 * col.r()) as u8;
             img[(x + y * W) * 4 + 1] = (255.0 * col.g()) as u8;
             img[(x + y * W) * 4 + 2] = (255.0 * col.b()) as u8;
         }
     }
 }
-fn color(r: &Ray) -> Vec3 {
-    let t: f64 = hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, &r);
-    if t > 0.0 {
-        let N: Vec3 = Vec3::unit_vector(&(r.point_at_parameter(t) - Vec3::new(0.0, 0.0, -1.0)));
-        return Vec3::new(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0) * 0.5;
+fn color(r: &Ray, world: &HitableList) -> Vec3 {
+    let rec: HitRecord = world.hit(&r, 0.0, std::f64::MAX).unwrap();
+    if rec.t != 0.0 {
+        return Vec3::new(
+            rec.normal.x() + 1.0,
+            rec.normal.y() + 1.0,
+            rec.normal.z() + 1.0,
+        ) * 0.5;
     }
     let unit_direction: Vec3 = Vec3::unit_vector(&r.direction());
     let t: f64 = 0.5 * (unit_direction.y() + 1.0);
     return Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t;
-}
-fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> f64 {
-    let oc: Vec3 = r.origin() - center;
-    let a: f64 = r.direction().dot(r.direction());
-    let b: f64 = oc.dot(r.direction()) * 2.0;
-    let c: f64 = oc.dot(oc) - radius * radius;
-    let discriminant: f64 = b * b - 4.0 * a * c;
-    if discriminant < 0.0 {
-        return -1.0;
-    } else {
-        return (-b - discriminant.sqrt()) / (2.0 * a);
-    }
 }
