@@ -3,9 +3,11 @@ mod hitable;
 mod ray;
 mod sphere;
 mod vec3;
+mod hitable_list;
 use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
 use ray::Ray;
 use vec3::Vec3;
+use hitable_list::HitableList;
 const W: usize = 640;
 const H: usize = 480;
 fn main() {
