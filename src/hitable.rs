@@ -10,6 +10,7 @@ pub struct HitRecord {
 pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
+#[derive(Debug)]
 pub enum hitableEnum {
     SphereE(Sphere),
 }
@@ -17,7 +18,8 @@ impl Hitable for hitableEnum {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
             SphereE => {
-                return self.hit(&r, t_min, t_max);
+                let hitableEnum::SphereE(rund) = &SphereE;
+                return rund.hit(&r, t_min, t_max);
             }
             _ => {
                 println!("smh. is not implemented for enum hitable");

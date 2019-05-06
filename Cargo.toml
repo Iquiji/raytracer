@@ -5,5 +5,5 @@ authors = ["Iquiji <yt.failerbot.3000@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-piston_window = "0.89.0"
+piston_window = "0.89"
 image = "0.21"

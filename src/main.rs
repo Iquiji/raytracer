@@ -14,23 +14,25 @@ use vec3::Vec3;
 const W: usize = 320;
 const H: usize = 240;
 fn main() {
+    /*
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
         .exit_on_esc(true)
         .build()
         .unwrap();
-
+    */
     let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
     render(&mut buf);
 
-    let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
-    let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
+    //let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+    image_crate::save_buffer("buf.png", &buf, W as u32 , H as u32 ,image_crate::ColorType::RGBA(8));
+/*    let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
 
     while let Some(event) = window.next() {
         window.draw_2d(&event, |context, graphics| {
             clear([1.0, 0.0, 0.5, 1.0], graphics);
             image(&texture, context.transform, graphics)
         });
-    }
+    }*/
 }
 fn render(img: &mut [u8]) {
     let lower_left_corner = Vec3::new(-2.0, -1.5, -1.0);
