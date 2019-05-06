@@ -18,7 +18,7 @@ impl Hitable for HitableList {
         for i in 0..self.hitable.len() {
             let temp = self.hitable[i].hit(&r, t_min, closest_so_far);
             match temp {
-                HitRecord => {
+                Some(HitRecord) => {
                     let temp = temp.unwrap();
                     hit_anything = true;
                     closest_so_far = temp.t;

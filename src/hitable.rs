@@ -19,7 +19,6 @@ impl Hitable for hitableEnum {
         match self {
             SphereE => {
                 let hitableEnum::SphereE(rund) = &SphereE;
-                println!("{:?}",rund);
                 return rund.hit(&r, t_min, t_max);
             }
             _ => {

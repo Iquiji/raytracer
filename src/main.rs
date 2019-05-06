@@ -11,8 +11,8 @@ use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, Window
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
-const W: usize = 320;
-const H: usize = 240;
+const W: usize = 640;
+const H: usize = 480;
 fn main() {
     /*
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
@@ -42,7 +42,7 @@ fn render(img: &mut [u8]) {
     let mut world: HitableList = HitableList {
         hitable: vec![
             hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)),
-            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)),
+            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 100.5, -1.0), 100.0)),
         ],
     };
     for x in 0..W {
@@ -63,7 +63,7 @@ fn render(img: &mut [u8]) {
 fn color(r: &Ray, world: &HitableList) -> Vec3 {
     let rec  = world.hit(&r, 0.0, std::f64::MAX);
     match rec {
-        HitRecord => {
+        Some(HitRecord) => {
             let rec = rec.unwrap();
             return Vec3::new(
                 rec.normal.x() + 1.0,
