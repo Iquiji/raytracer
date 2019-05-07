@@ -60,6 +60,7 @@ fn render(img: &mut [u8]) {
                 col += color(&r, &world);
             }
             col /= Ns as f64;
+            col = Vec3::new(col.r().sqrt(), col.g().sqrt(),col.b().sqrt());
             img[(x + y * W) * 4 + 0] = (255.0 * col.r()) as u8;
             img[(x + y * W) * 4 + 1] = (255.0 * col.g()) as u8;
             img[(x + y * W) * 4 + 2] = (255.0 * col.b()) as u8;
@@ -67,15 +68,12 @@ fn render(img: &mut [u8]) {
     }
 }
 fn color(r: &Ray, world: &HitableList) -> Vec3 {
-    let rec  = world.hit(&r, 0.0, std::f64::MAX);
+    let rec  = world.hit(&r, 0.001, std::f64::MAX);
     match rec {
         Some(HitRecord) => {
             let rec = rec.unwrap();
-            return Vec3::new(
-                rec.normal.x() + 1.0,
-                rec.normal.y() + 1.0,
-                rec.normal.z() + 1.0,
-            ) * 0.5;
+            let target: Vec3 = rec.p + rec.normal + sphere::Sphere::random_in_unit_sphere();
+            return color(&Ray::new(rec.p, target-rec.p),&world)*0.5;
         }
         _ => {}
     }

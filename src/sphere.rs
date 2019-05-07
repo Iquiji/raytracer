@@ -1,6 +1,7 @@
 use crate::hitable::{HitRecord, Hitable};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use rand::prelude::*;
 #[derive(Debug)]
 pub struct Sphere {
     pub center: Vec3,
@@ -12,6 +13,17 @@ impl Sphere {
             center: center,
             radius: rd,
         }
+    }
+    pub fn random_in_unit_sphere() -> Vec3{
+        let mut p : Vec3;
+        let mut rng = rand::thread_rng();
+        loop{
+            p = Vec3::new(rng.gen::<f64>(),rng.gen::<f64>(),rng.gen::<f64>())*2.0 - Vec3::new(1.0, 1.0, 1.0);
+            if p.len_sq() >= 1.0 {
+                break;
+            }
+        }
+        return p;
     }
 }
 impl Hitable for Sphere {
