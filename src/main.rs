@@ -1,4 +1,5 @@
 extern crate image as image_crate;
+use rand::prelude::*;
 mod hitable;
 mod hitable_list;
 mod ray;
@@ -12,8 +13,10 @@ use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, Window
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
+use camera::Camera;
 const W: usize = 640;
 const H: usize = 480;
+const Ns : usize = 100;
 fn main() {
     /*
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
@@ -36,25 +39,27 @@ fn main() {
     }*/
 }
 fn render(img: &mut [u8]) {
-    let lower_left_corner = Vec3::new(-2.0, -1.5, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 3.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
     let mut world: HitableList = HitableList {
         hitable: vec![
             hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)),
             hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 100.5, -1.0), 100.0)),
         ],
     };
+    let cam = Camera::std();
     for x in 0..W {
-        if x%W == 0{
-            println!("{}",x);
+        if x%(W/10) == 0{
+            println!("{}%",(x as f64 / W as f64)* 100.0);
         }
         for y in 0..H {
-            let u = (x as f64 / W as f64);
-            let v = (y as f64 / H as f64);
-            let r = Ray::new(origin, lower_left_corner + horizontal * u + vertical * v);
-            let col = color(&r, &world);
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
+            let mut rng = rand::thread_rng();
+            for s in 0..Ns{
+                let u = ((x as f64 + rng.gen::<f64>()) / W as f64);
+                let v = ((y as f64 + rng.gen::<f64>()) / H as f64);
+                let r: Ray = cam.get_ray(u, v);
+                col += color(&r, &world);
+            }
+            col /= Ns as f64;
             img[(x + y * W) * 4 + 0] = (255.0 * col.r()) as u8;
             img[(x + y * W) * 4 + 1] = (255.0 * col.g()) as u8;
             img[(x + y * W) * 4 + 2] = (255.0 * col.b()) as u8;
