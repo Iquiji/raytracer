@@ -4,6 +4,7 @@ mod hitable_list;
 mod ray;
 mod sphere;
 mod vec3;
+mod camera;
 use crate::hitable::Hitable;
 use hitable::{hitableEnum, HitRecord};
 use hitable_list::HitableList;
