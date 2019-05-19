@@ -6,6 +6,7 @@ mod ray;
 mod sphere;
 mod vec3;
 mod camera;
+mod material;
 use crate::hitable::Hitable;
 use hitable::{hitableEnum, HitRecord};
 use hitable_list::HitableList;
@@ -14,6 +15,7 @@ use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 use camera::Camera;
+use material::{Metal,Material,MaterialEnum,Lambertian};
 const W: usize = 640;
 const H: usize = 480;
 const Ns : usize = 100;
@@ -41,8 +43,10 @@ fn main() {
 fn render(img: &mut [u8]) {
     let mut world: HitableList = HitableList {
         hitable: vec![
-            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)),
-            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 100.5, -1.0), 100.0)),
+            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5,MaterialEnum::Lambertian(Lambertian::new(0.8,0.3,0.3)))),
+            hitableEnum::SphereE(Sphere::new(Vec3::new(0.0, 100.5, -1.0), 100.0,MaterialEnum::Lambertian(Lambertian::new(0.8,0.8,0.0)))),
+            hitableEnum::SphereE(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5,MaterialEnum::Metal(Metal::new(0.8,0.6,0.2)))),
+            hitableEnum::SphereE(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5,MaterialEnum::Metal(Metal::new(0.8,0.8,0.8)))),
         ],
     };
     let cam = Camera::std();
@@ -57,7 +61,7 @@ fn render(img: &mut [u8]) {
                 let u = ((x as f64 + rng.gen::<f64>()) / W as f64);
                 let v = ((y as f64 + rng.gen::<f64>()) / H as f64);
                 let r: Ray = cam.get_ray(u, v);
-                col += color(&r, &world);
+                col += color(&r, &world,0);
             }
             col /= Ns as f64;
             col = Vec3::new(col.r().sqrt(), col.g().sqrt(),col.b().sqrt());
@@ -67,13 +71,21 @@ fn render(img: &mut [u8]) {
         }
     }
 }
-fn color(r: &Ray, world: &HitableList) -> Vec3 {
+fn color(r: &Ray, world: &HitableList,depth : u32) -> Vec3 {
     let rec  = world.hit(&r, 0.001, std::f64::MAX);
     match rec {
         Some(HitRecord) => {
             let rec = rec.unwrap();
-            let target: Vec3 = rec.p + rec.normal + sphere::Sphere::random_in_unit_sphere();
-            return color(&Ray::new(rec.p, target-rec.p),&world)*0.5;
+            let mut attunation : Vec3 = Vec3::new(0.0, 0.0, 0.0);
+            let scattered = rec.material.scatter(r,&rec,&mut attunation);
+            match scattered {
+                Some(ref r2) if depth < 50 => {
+                    return attunation*color(&r2, &world, depth+1);
+                }
+                _ => {
+                    return Vec3::new(0.0, 0.0, 0.0);
+                }
+            }
         }
         _ => {}
     }

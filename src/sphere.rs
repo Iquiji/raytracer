@@ -2,16 +2,19 @@ use crate::hitable::{HitRecord, Hitable};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use rand::prelude::*;
+use crate::material::MaterialEnum;
 #[derive(Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
+    pub mat : MaterialEnum,
 }
 impl Sphere {
-    pub fn new(center: Vec3, rd: f64) -> Self {
+    pub fn new(center: Vec3, rd: f64,mat : MaterialEnum) -> Self {
         Self {
             center: center,
             radius: rd,
+            mat : mat,
         }
     }
     pub fn random_in_unit_sphere() -> Vec3{
@@ -40,6 +43,7 @@ impl Hitable for Sphere {
                     t: temp,
                     p: r.point_at_parameter(temp),
                     normal: (r.point_at_parameter(temp) - self.center) / self.radius,
+                    material: self.mat,
                 });
             }
         }
