@@ -37,7 +37,7 @@ impl Metal {
 }
 impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord, attunuation: &mut Vec3) -> Option<Ray> {
-        let reflected: Vec3 = Vec3::reflect(&r.direction(), &rec.normal);
+        let reflected: Vec3 = Vec3::reflect(&r.direction().unit_vector(), &rec.normal);
         let scattered: Ray = Ray::new(rec.p, reflected);
         *attunuation = self.albedo;
         if (Vec3::dot(&scattered.direction(), rec.normal) > 0.0) {
