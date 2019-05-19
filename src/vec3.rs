@@ -49,8 +49,8 @@ impl Vec3 {
         let f = self.len();
         Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
-    pub fn reflect(v: &Vec3,n: &Vec3) -> Vec3{
-        return *v - *n*2.0*Vec3::dot(v,*n);
+    pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+        return *v - *n * 2.0 * Vec3::dot(v, *n);
     }
 }
 

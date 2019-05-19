@@ -1,8 +1,8 @@
 use crate::hitable::{hitableEnum, HitRecord, Hitable};
+use crate::material::{MaterialEnum, Metal};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
-use crate::material::{Metal,MaterialEnum};
 
 pub struct HitableList {
     pub hitable: Vec<hitableEnum>,
@@ -13,7 +13,7 @@ impl Hitable for HitableList {
             t: 0.0,
             p: Vec3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
-            material : MaterialEnum::Metal(Metal::new(0.0, 0.0, 0.0)),
+            material: MaterialEnum::Metal(Metal::new(0.0, 0.0, 0.0)),
         };
         let mut hit_anything: bool = false;
         let mut closest_so_far: f64 = t_max;
@@ -26,7 +26,7 @@ impl Hitable for HitableList {
                     closest_so_far = temp.t;
                     rec = temp;
                 }
-                _=> {}
+                _ => {}
             }
         }
         if hit_anything {

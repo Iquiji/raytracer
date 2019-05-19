@@ -1,8 +1,8 @@
+use crate::material::MaterialEnum;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
-use crate::material::MaterialEnum;
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct HitRecord {
     pub t: f64,
     pub p: Vec3,

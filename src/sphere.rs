@@ -1,27 +1,28 @@
 use crate::hitable::{HitRecord, Hitable};
+use crate::material::MaterialEnum;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use rand::prelude::*;
-use crate::material::MaterialEnum;
 #[derive(Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub mat : MaterialEnum,
+    pub mat: MaterialEnum,
 }
 impl Sphere {
-    pub fn new(center: Vec3, rd: f64,mat : MaterialEnum) -> Self {
+    pub fn new(center: Vec3, rd: f64, mat: MaterialEnum) -> Self {
         Self {
             center: center,
             radius: rd,
-            mat : mat,
+            mat: mat,
         }
     }
-    pub fn random_in_unit_sphere() -> Vec3{
-        let mut p : Vec3;
+    pub fn random_in_unit_sphere() -> Vec3 {
+        let mut p: Vec3;
         let mut rng = rand::thread_rng();
-        loop{
-            p = Vec3::new(rng.gen::<f64>(),rng.gen::<f64>(),rng.gen::<f64>())*2.0 - Vec3::new(1.0, 1.0, 1.0);
+        loop {
+            p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>()) * 2.0
+                - Vec3::new(1.0, 1.0, 1.0);
             if p.len_sq() >= 1.0 {
                 break;
             }
