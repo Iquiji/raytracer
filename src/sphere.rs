@@ -47,6 +47,15 @@ impl Hitable for Sphere {
                     material: self.mat,
                 });
             }
+            let temp = (-b + discriminant.sqrt()) / (2.0 * a);
+            if (temp < t_max && temp > t_min) {
+                return Some(HitRecord {
+                    t: temp,
+                    p: r.point_at_parameter(temp),
+                    normal: (r.point_at_parameter(temp) - self.center) / self.radius,
+                    material: self.mat,
+                });
+            }
         }
         return None;
     }
