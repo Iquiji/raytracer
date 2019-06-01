@@ -1,4 +1,4 @@
-use crate::hitable::{hitableEnum, HitRecord, Hitable};
+use crate::hitable::{HitRecord};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
@@ -15,10 +15,10 @@ impl Material for MaterialEnum {
         use MaterialEnum::*;
         match self {
             Metal(m) => {
-                return m.scatter(r, rec, attunuation);
+                m.scatter(r, rec, attunuation)
             }
             Lambertian(m) => {
-                return m.scatter(r, rec, attunuation);
+                m.scatter(r, rec, attunuation)
             }
         }
     }
@@ -40,10 +40,11 @@ impl Material for Metal {
         let reflected: Vec3 = Vec3::reflect(&r.direction().unit_vector(), &rec.normal);
         let scattered: Ray = Ray::new(rec.p, reflected);
         *attunuation = self.albedo;
-        if (Vec3::dot(&scattered.direction(), rec.normal) > 0.0) {
-            return Some(scattered);
+        if Vec3::dot(&scattered.direction(), rec.normal) > 0.0 {
+            Some(scattered)
+        }else{
+            None
         }
-        return None;
     }
 }
 
@@ -52,10 +53,10 @@ pub struct Lambertian {
     albedo: Vec3,
 }
 impl Material for Lambertian {
-    fn scatter(&self, r: &Ray, rec: &HitRecord, attunuation: &mut Vec3) -> Option<Ray> {
+    fn scatter(&self, _: &Ray, rec: &HitRecord, attunuation: &mut Vec3) -> Option<Ray> {
         let target: Vec3 = rec.p + rec.normal + Sphere::random_in_unit_sphere();
         *attunuation = self.albedo;
-        return Some(Ray::new(rec.p, target - rec.p));
+        Some(Ray::new(rec.p, target - rec.p))
     }
 }
 impl Lambertian {

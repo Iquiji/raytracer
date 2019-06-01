@@ -1,11 +1,10 @@
-use crate::hitable::{hitableEnum, HitRecord, Hitable};
+use crate::hitable::{HitableEnum, HitRecord, Hitable};
 use crate::material::{MaterialEnum, Metal};
 use crate::ray::Ray;
-use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
 pub struct HitableList {
-    pub hitable: Vec<hitableEnum>,
+    pub hitable: Vec<HitableEnum>,
 }
 impl Hitable for HitableList {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -19,19 +18,15 @@ impl Hitable for HitableList {
         let mut closest_so_far: f64 = t_max;
         for i in 0..self.hitable.len() {
             let temp = self.hitable[i].hit(&r, t_min, closest_so_far);
-            match temp {
-                Some(HitRecord) => {
-                    let temp = temp.unwrap();
+                if let Some(hit_record) = temp{
                     hit_anything = true;
-                    closest_so_far = temp.t;
-                    rec = temp;
+                    closest_so_far = hit_record.t;
+                    rec = hit_record;
                 }
-                _ => {}
             }
-        }
         if hit_anything {
             return Some(rec);
         }
-        return None;
+        None
     }
 }

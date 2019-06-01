@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #[derive(Default, Clone, Copy, Debug)]
 pub struct Vec3 {
     pub e: [f64; 3],
@@ -50,7 +51,7 @@ impl Vec3 {
         Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        return *v - *n * 2.0 * Vec3::dot(v, *n);
+        *v - *n * 2.0 * Vec3::dot(v, *n)
     }
 }
 

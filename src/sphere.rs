@@ -10,11 +10,11 @@ pub struct Sphere {
     pub mat: MaterialEnum,
 }
 impl Sphere {
-    pub fn new(center: Vec3, rd: f64, mat: MaterialEnum) -> Self {
+    pub fn new(center: Vec3, radius: f64, mat: MaterialEnum) -> Self {
         Self {
-            center: center,
-            radius: rd,
-            mat: mat,
+            center,
+            radius,
+            mat,
         }
     }
     pub fn random_in_unit_sphere() -> Vec3 {
@@ -39,7 +39,7 @@ impl Hitable for Sphere {
         let discriminant: f64 = b * b - a * c;
         if discriminant > 0.0 {
             let temp = (-b - discriminant.sqrt()) /a;
-            if (temp < t_max && temp > t_min) {
+            if temp < t_max && temp > t_min {
                 return Some(HitRecord {
                     t: temp,
                     p: r.point_at_parameter(temp),
@@ -48,7 +48,7 @@ impl Hitable for Sphere {
                 });
             }
             let temp = (-b + discriminant.sqrt()) /a;
-            if (temp < t_max && temp > t_min) {
+            if temp < t_max && temp > t_min {
                 return Some(HitRecord {
                     t: temp,
                     p: r.point_at_parameter(temp),
@@ -57,6 +57,6 @@ impl Hitable for Sphere {
                 });
             }
         }
-        return None;
+        None
     }
 }

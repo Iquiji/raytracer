@@ -13,19 +13,14 @@ pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 #[derive(Debug)]
-pub enum hitableEnum {
+pub enum HitableEnum {
     SphereE(Sphere),
 }
-impl Hitable for hitableEnum {
+impl Hitable for HitableEnum {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
-            SphereE => {
-                let hitableEnum::SphereE(rund) = &SphereE;
-                return rund.hit(&r, t_min, t_max);
-            }
-            _ => {
-                println!("smh. is not implemented for enum hitable");
-                return None;
+            HitableEnum::SphereE(sphere) => {
+                sphere.hit(&r, t_min, t_max)
             }
         }
     }
