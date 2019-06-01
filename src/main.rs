@@ -10,7 +10,7 @@ mod sphere;
 mod vec3;
 use crate::hitable::Hitable;
 use camera::Camera;
-use hitable::{HitableEnum};
+use hitable::HitableEnum;
 use hitable_list::HitableList;
 use material::{Lambertian, Material, MaterialEnum, Metal};
 //use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
@@ -37,7 +37,8 @@ fn main() {
         W as u32,
         H as u32,
         image_crate::ColorType::RGBA(8),
-    ).expect("could not save img");
+    )
+    .expect("could not save img");
     /*    let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
 
     while let Some(event) = window.next() {
@@ -63,12 +64,12 @@ fn render(img: &mut [u8]) {
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(1.0, 0.0, -1.0),
                 0.5,
-                MaterialEnum::Metal(Metal::new(0.8, 0.6, 0.2,1.0)),
+                MaterialEnum::Metal(Metal::new(0.8, 0.6, 0.2, 1.0)),
             )),
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(-1.0, 0.0, -1.0),
                 0.5,
-                MaterialEnum::Metal(Metal::new(0.8, 0.8, 0.8,0.09)),
+                MaterialEnum::Metal(Metal::new(0.8, 0.8, 0.8, 0.09)),
             )),
         ],
     };

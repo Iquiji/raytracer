@@ -19,9 +19,7 @@ pub enum HitableEnum {
 impl Hitable for HitableEnum {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
-            HitableEnum::SphereE(sphere) => {
-                sphere.hit(&r, t_min, t_max)
-            }
+            HitableEnum::SphereE(sphere) => sphere.hit(&r, t_min, t_max),
         }
     }
 }

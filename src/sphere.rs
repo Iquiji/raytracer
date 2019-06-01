@@ -26,7 +26,7 @@ impl Sphere {
             if p.len_sq() >= 1.0 {
                 continue;
             }
-            return p
+            return p;
         }
     }
 }
@@ -38,7 +38,7 @@ impl Hitable for Sphere {
         let c: f64 = oc.dot(oc) - (self.radius * self.radius);
         let discriminant: f64 = b * b - a * c;
         if discriminant > 0.0 {
-            let temp = (-b - discriminant.sqrt()) /a;
+            let temp = (-b - discriminant.sqrt()) / a;
             if temp < t_max && temp > t_min {
                 return Some(HitRecord {
                     t: temp,
@@ -47,7 +47,7 @@ impl Hitable for Sphere {
                     material: self.mat,
                 });
             }
-            let temp = (-b + discriminant.sqrt()) /a;
+            let temp = (-b + discriminant.sqrt()) / a;
             if temp < t_max && temp > t_min {
                 return Some(HitRecord {
                     t: temp,
