@@ -12,7 +12,7 @@ impl Hitable for HitableList {
             t: 0.0,
             p: Vec3::new(0.0, 0.0, 0.0),
             normal: Vec3::new(0.0, 0.0, 0.0),
-            material: MaterialEnum::Metal(Metal::new(0.0, 0.0, 0.0)),
+            material: MaterialEnum::Metal(Metal::new(0.0, 0.0, 0.0,0.0)),
         };
         let mut hit_anything: bool = false;
         let mut closest_so_far: f64 = t_max;

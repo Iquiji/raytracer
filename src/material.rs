@@ -27,18 +27,20 @@ impl Material for MaterialEnum {
 #[derive(Debug, Clone, Copy)]
 pub struct Metal {
     albedo: Vec3,
+    fuzz: f64,
 }
 impl Metal {
-    pub fn new(r: f64, g: f64, b: f64) -> Self {
+    pub fn new(r: f64, g: f64, b: f64,fuzz: f64) -> Self {
         Metal {
             albedo: Vec3::new(r, g, b),
+            fuzz: if fuzz -1.0 < 0.0 {fuzz}else{1.0},
         }
     }
 }
 impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord, attunuation: &mut Vec3) -> Option<Ray> {
         let reflected: Vec3 = Vec3::reflect(&r.direction().unit_vector(), &rec.normal);
-        let scattered: Ray = Ray::new(rec.p, reflected);
+        let scattered: Ray = Ray::new(rec.p, reflected + Sphere::random_in_unit_sphere()*self.fuzz);
         *attunuation = self.albedo;
         if Vec3::dot(&scattered.direction(), rec.normal) > 0.0 {
             Some(scattered)
