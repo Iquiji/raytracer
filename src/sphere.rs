@@ -24,10 +24,10 @@ impl Sphere {
             p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>()) * 2.0
                 - Vec3::new(1.0, 1.0, 1.0);
             if p.len_sq() >= 1.0 {
-                break;
+                continue;
             }
+            return p
         }
-        return p;
     }
 }
 impl Hitable for Sphere {
