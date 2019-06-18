@@ -12,7 +12,7 @@ use crate::hitable::Hitable;
 use camera::Camera;
 use hitable::HitableEnum;
 use hitable_list::HitableList;
-use material::{Lambertian, Material, MaterialEnum, Metal};
+use material::{Lambertian, Material, MaterialEnum, Metal,Dielectric};
 //use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
 use ray::Ray;
 use sphere::Sphere;
@@ -69,7 +69,12 @@ fn render(img: &mut [u8]) {
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(-1.0, 0.0, -1.0),
                 0.5,
-                MaterialEnum::Metal(Metal::new(0.8, 0.8, 0.8, 0.09)),
+                MaterialEnum::Dielectric(Dielectric::new(1.5)),
+            )),
+            HitableEnum::SphereE(Sphere::new(
+                Vec3::new(-1.0, 0.0, -1.0),
+                -0.45,
+                MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
         ],
     };

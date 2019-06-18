@@ -50,8 +50,17 @@ impl Vec3 {
         let f = self.len();
         Self::new(self.e[0] / f, self.e[1] / f, self.e[2] / f)
     }
-    pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        *v - *n * 2.0 * Vec3::dot(v, *n)
+    pub fn reflect(&self, n: &Vec3) -> Vec3 {
+        *self - *n * 2.0 * Vec3::dot(self, *n)
+    }
+    pub fn refract(&self,n:Vec3,ni_over_nt: f64) -> Option<Vec3>{
+        let uv : Vec3 = self.unit_vector();
+        let dt :f64 = uv.dot(n);
+        let discriminant : f64 = 1.0-ni_over_nt*ni_over_nt*(1.0-dt*dt);
+        if discriminant > 0.0{
+            return Some((uv-n*dt)*ni_over_nt-n*discriminant.sqrt());
+        }
+        None
     }
 }
 
