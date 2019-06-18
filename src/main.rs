@@ -13,24 +13,19 @@ use camera::Camera;
 use hitable::HitableEnum;
 use hitable_list::HitableList;
 use material::{Lambertian, Material, MaterialEnum, Metal,Dielectric};
-//use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings};
+use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings,Loop,Event,EventLoop};
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 const W: usize = 640;
 const H: usize = 480;
-const NS: usize = 100;
+const NS: usize = 3;
 fn main() {
-    /*
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
         .exit_on_esc(true)
         .build()
         .unwrap();
-    */
-    let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-    render(&mut buf);
-
-    //let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+/*
     image_crate::save_buffer(
         "buf.png",
         &buf,
@@ -39,14 +34,32 @@ fn main() {
         image_crate::ColorType::RGBA(8),
     )
     .expect("could not save img");
-    /*    let texture = Texture::from_image(&mut window.factory, &img, &TextureSettings::new()).unwrap();
-
+*/  
+    window.set_ups(10);
+    window.set_ups_reset(1);
+    let mut tctx = window.create_texture_context();
+    let mut changed = true;
+    let mut texture = None;
     while let Some(event) = window.next() {
-        window.draw_2d(&event, |context, graphics| {
+        //eprintln!("Event: {:?}", event);
+        if let Event::Loop(Loop::Update(args)) = event {
+            eprintln!("Loop::Update args: {:?}", args);
+            changed = true;
+        }
+        if changed {
+            let start = std::time::Instant::now();
+            let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
+            render(&mut buf);
+            let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+            texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
+            eprintln!("Rendering {}x{}@{} pixel took {:?}", W, H, NS, start.elapsed());
+            changed = false;
+        }
+        window.draw_2d(&event, |context, graphics,_| {
             clear([1.0, 0.0, 0.5, 1.0], graphics);
-            image(&texture, context.transform, graphics)
+            image(texture.as_ref().expect("rendered texture"), context.transform, graphics)
         });
-    }*/
+    }
 }
 fn render(img: &mut [u8]) {
     let world: HitableList = HitableList {
@@ -80,9 +93,9 @@ fn render(img: &mut [u8]) {
     };
     let cam = Camera::std();
     for x in 0..W {
-        if x % (W / 10) == 0 {
-            println!("{}%", (x as f64 / W as f64) * 100.0);
-        }
+        // if x % (W / 10) == 0 {
+        //     println!("{}%", (x as f64 / W as f64) * 100.0);
+        // }
         for y in 0..H {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
             let mut rng = rand::thread_rng();
