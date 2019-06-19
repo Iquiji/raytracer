@@ -145,6 +145,13 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera) {
             }
         }
     }
+    *cam = Camera::new(
+        cam.origin + Vec3::new(0.1, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        (W as f64) / (H as f64),
+    );
 }
 fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
     for x in 0..W {
