@@ -22,34 +22,41 @@ const H: usize = 480;
 const NS: usize = 5;
 const MAX_DEPTH : u32 = 50;
 fn main() {
-    let mut world: HitableList = HitableList {
-         hitable:  vec![
-            HitableEnum::SphereE(Sphere::new(
-                Vec3::new(0.0, 0.0, -1.0),
-                0.5,
-                MaterialEnum::Lambertian(Lambertian::new(0.8, 0.3, 0.3)),
-            )),
-            HitableEnum::SphereE(Sphere::new(
-                Vec3::new(0.0, 100.5, -1.0),
-                100.0,
-                MaterialEnum::Lambertian(Lambertian::new(0.8, 0.8, 0.0)),
-            )),
-            HitableEnum::SphereE(Sphere::new(
-                Vec3::new(1.0, 0.0, -1.0),
-                0.5,
-                MaterialEnum::Metal(Metal::new(0.8, 0.6, 0.2, 1.0)),
-            )),
-            HitableEnum::SphereE(Sphere::new(
-                Vec3::new(-1.0, 0.0, -1.0),
-                0.5,
-                MaterialEnum::Dielectric(Dielectric::new(1.5)),
-            )),
-            HitableEnum::SphereE(Sphere::new(
-                Vec3::new(-1.0, 0.0, -0.9),
-                -0.45,
-                MaterialEnum::Dielectric(Dielectric::new(1.5)),
-            )),
-        ],
+    // let mut world: HitableList = HitableList {
+    //      hitable:  vec![
+    //         HitableEnum::SphereE(Sphere::new(
+    //             Vec3::new(0.0, 0.0, -1.0),
+    //             0.5,
+    //             MaterialEnum::Lambertian(Lambertian::new(0.8, 0.3, 0.3)),
+    //         )),
+    //         HitableEnum::SphereE(Sphere::new(
+    //             Vec3::new(0.0, 100.5, -1.0),
+    //             100.0,
+    //             MaterialEnum::Lambertian(Lambertian::new(0.8, 0.8, 0.0)),
+    //         )),
+    //         HitableEnum::SphereE(Sphere::new(
+    //             Vec3::new(1.0, 0.0, -1.0),
+    //             0.5,
+    //             MaterialEnum::Metal(Metal::new(0.8, 0.6, 0.2, 1.0)),
+    //         )),
+    //         HitableEnum::SphereE(Sphere::new(
+    //             Vec3::new(-1.0, 0.0, -1.0),
+    //             0.5,
+    //             MaterialEnum::Dielectric(Dielectric::new(1.5)),
+    //         )),
+    //         HitableEnum::SphereE(Sphere::new(
+    //             Vec3::new(-1.0, 0.0, -0.9),
+    //             -0.45,
+    //             MaterialEnum::Dielectric(Dielectric::new(1.5)),
+    //         )),
+    //     ],
+    // };
+    let r = (std::f64::consts::PI/4.0).cos();
+    let mut world : HitableList = HitableList{
+        hitable: vec![
+        HitableEnum::SphereE(Sphere::new(Vec3::new(-r, 0.0, -1.0),r,MaterialEnum::Lambertian(Lambertian::new(0.0, 0.0, 1.0)))),
+        HitableEnum::SphereE(Sphere::new(Vec3::new(r, 0.0, -1.0),r,MaterialEnum::Lambertian(Lambertian::new(1.0, 0.0, 0.0)))),
+        ]
     };
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
         .exit_on_esc(true)
@@ -82,7 +89,7 @@ fn main() {
         if changed {
             let start = std::time::Instant::now();
             let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-            world = animate(world,&mut forward);
+            //world = animate(world,&mut forward);
             render(&mut buf,&world);
             let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
@@ -116,7 +123,7 @@ fn animate(world:HitableList,forward: &mut bool)-> HitableList{
     world_new
 }
 fn render(img: &mut [u8],world: &HitableList) {
-    let cam = Camera::std();
+    let cam = Camera::new(90.0, W as f64 / H as f64);
     for x in 0..W {
         // if x % (W / 10) == 0 {
         //     println!("{}%", (x as f64 / W as f64) * 100.0);
