@@ -21,18 +21,18 @@ impl Camera {
             self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin,
         )
     }
-    pub fn new(lookfrom: Vec3,lookat: Vec3,vup: Vec3,vfov : f64,aspect : f64) -> Self {
-        let theta: f64 = vfov*std::f64::consts::PI/180.0;
-        let half_height : f64 = (theta/2.0).tan();
-        let half_width : f64 = (aspect)*half_height;
-        let w : Vec3 = (lookfrom-lookat).unit_vector();
-        let u : Vec3 = vup.cross(w).unit_vector();
-        let v : Vec3 = w.cross(u);
-        Self{
-            lower_left_corner: lookfrom - u*half_width -v*half_height -w,
-            horizontal: u*half_width*2.0,
-            vertical: v*half_height*2.0,
+    pub fn new(lookfrom: Vec3, lookat: Vec3, vup: Vec3, vfov: f64, aspect: f64) -> Self {
+        let theta: f64 = vfov * std::f64::consts::PI / 180.0;
+        let half_height: f64 = (theta / 2.0).tan();
+        let half_width: f64 = (aspect) * half_height;
+        let w: Vec3 = (lookfrom - lookat).unit_vector();
+        let u: Vec3 = vup.cross(w).unit_vector();
+        let v: Vec3 = w.cross(u);
+        Self {
+            lower_left_corner: lookfrom - u * half_width - v * half_height - w,
+            horizontal: u * half_width * 2.0,
+            vertical: v * half_height * 2.0,
             origin: lookfrom,
-        } 
+        }
     }
 }

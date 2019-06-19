@@ -2,6 +2,7 @@ use crate::material::MaterialEnum;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
+
 #[derive(Debug, Clone, Copy)]
 pub struct HitRecord {
     pub t: f64,
@@ -12,7 +13,8 @@ pub struct HitRecord {
 pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
-#[derive(Debug,Clone,Copy)]
+
+#[derive(Debug, Clone)]
 pub enum HitableEnum {
     SphereE(Sphere),
 }

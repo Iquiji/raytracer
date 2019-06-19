@@ -12,18 +12,20 @@ use crate::hitable::Hitable;
 use camera::Camera;
 use hitable::HitableEnum;
 use hitable_list::HitableList;
-use material::{Lambertian, Material, MaterialEnum, Metal,Dielectric};
-use piston_window::{clear, image, PistonWindow, Texture, TextureSettings, WindowSettings,Loop,Event,EventLoop};
+use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
+use piston_window::{
+    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,
+};
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
 const W: usize = 640;
 const H: usize = 480;
 const NS: usize = 5;
-const MAX_DEPTH : u32 = 50;
+const MAX_DEPTH: u32 = 50;
 fn main() {
     let mut world: HitableList = HitableList {
-         hitable:  vec![
+        hitable: vec![
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(0.0, 0.0, -1.0),
                 0.5,
@@ -46,27 +48,34 @@ fn main() {
             )),
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(-1.0, 0.0, -0.9),
-                -0.45,
+                -0.5,
                 MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
         ],
     };
+    let mut cam = Camera::new(
+        Vec3::new(-2.0, -2.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        (W as f64) / (H as f64),
+    );
     let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
         .exit_on_esc(true)
         .build()
         .unwrap();
-/*
-    image_crate::save_buffer(
-        "buf.png",
-        &buf,
-        W as u32,
-        H as u32,
-        image_crate::ColorType::RGBA(8),
-    )
-    .expect("could not save img");
-*/  
+    /*
+        image_crate::save_buffer(
+            "buf.png",
+            &buf,
+            W as u32,
+            H as u32,
+            image_crate::ColorType::RGBA(8),
+        )
+        .expect("could not save img");
+    */
 
-    let mut forward : bool = true;
+    let mut forward: bool = true;
 
     window.set_ups(10);
     window.set_ups_reset(1);
@@ -82,45 +91,62 @@ fn main() {
         if changed {
             let start = std::time::Instant::now();
             let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-            world = animate(world,&mut forward);
-            render(&mut buf,&world);
+            animate(&mut world, &mut forward, &mut cam);
+            render(&mut buf, &world, &cam);
             let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
-            eprintln!("Rendering {}x{}@{} pixel took {:?}", W, H, NS, start.elapsed());
+            eprintln!(
+                "Rendering {}x{}@{} pixel took {:?}",
+                W,
+                H,
+                NS,
+                start.elapsed()
+            );
             changed = false;
         }
-        window.draw_2d(&event, |context, graphics,_| {
+        window.draw_2d(&event, |context, graphics, _| {
             clear([1.0, 0.0, 0.5, 1.0], graphics);
-            image(texture.as_ref().expect("rendered texture"), context.transform, graphics)
+            image(
+                texture.as_ref().expect("rendered texture"),
+                context.transform,
+                graphics,
+            )
         });
     }
 }
-fn animate(world:HitableList,forward: &mut bool)-> HitableList{
-    let mut world_new = world.clone();
-    let buf = &world.hitable[4];
-    match buf{
-        HitableEnum::SphereE(sph) => {
-            if sph.center.x() > 1.0{
-               *forward = false; 
-            }else if sph.center.x() < -1.0{
+fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera) {
+    let buf = &mut world.hitable[4];
+    match buf {
+        HitableEnum::SphereE(ref mut sph) => {
+            if sph.center.x() > 1.0 {
+                *forward = false;
+            } else if sph.center.x() < -1.0 {
                 *forward = true;
             }
-            if *forward{
-                world_new.hitable[4] = HitableEnum::SphereE(Sphere::new(Vec3::new(sph.center.x() +0.01, sph.center.y(), sph.center.z()), sph.radius, sph.mat));
-            }else{
-                world_new.hitable[4] = HitableEnum::SphereE(Sphere::new(Vec3::new(sph.center.x() -0.01, sph.center.y(), sph.center.z()), sph.radius, sph.mat));
+            if *forward {
+                sph.center.e[0] += 0.01;
+            } else {
+                sph.center.e[0] -= 0.01;
             }
-
         }
     }
-    world_new
+    let buf = &mut world.hitable[3];
+    match buf {
+        HitableEnum::SphereE(ref mut sph) => {
+            if sph.center.x() > 1.0 {
+                *forward = false;
+            } else if sph.center.x() < -1.0 {
+                *forward = true;
+            }
+            if *forward {
+                sph.center.e[0] += 0.01;
+            } else {
+                sph.center.e[0] -= 0.01;
+            }
+        }
+    }
 }
-fn render(img: &mut [u8],world: &HitableList) {
-    let cam = Camera::new(
-        Vec3::new(-2.0, -2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        90.0, (W as f64) / (H as f64));
+fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
     for x in 0..W {
         // if x % (W / 10) == 0 {
         //     println!("{}%", (x as f64 / W as f64) * 100.0);
