@@ -19,51 +19,11 @@ use sphere::Sphere;
 use vec3::Vec3;
 const W: usize = 640;
 const H: usize = 480;
-const NS: usize = 3;
+const NS: usize = 5;
+const MAX_DEPTH : u32 = 50;
 fn main() {
-    let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
-        .exit_on_esc(true)
-        .build()
-        .unwrap();
-/*
-    image_crate::save_buffer(
-        "buf.png",
-        &buf,
-        W as u32,
-        H as u32,
-        image_crate::ColorType::RGBA(8),
-    )
-    .expect("could not save img");
-*/  
-    window.set_ups(10);
-    window.set_ups_reset(1);
-    let mut tctx = window.create_texture_context();
-    let mut changed = true;
-    let mut texture = None;
-    while let Some(event) = window.next() {
-        //eprintln!("Event: {:?}", event);
-        if let Event::Loop(Loop::Update(args)) = event {
-            eprintln!("Loop::Update args: {:?}", args);
-            changed = true;
-        }
-        if changed {
-            let start = std::time::Instant::now();
-            let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-            render(&mut buf);
-            let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
-            texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
-            eprintln!("Rendering {}x{}@{} pixel took {:?}", W, H, NS, start.elapsed());
-            changed = false;
-        }
-        window.draw_2d(&event, |context, graphics,_| {
-            clear([1.0, 0.0, 0.5, 1.0], graphics);
-            image(texture.as_ref().expect("rendered texture"), context.transform, graphics)
-        });
-    }
-}
-fn render(img: &mut [u8]) {
-    let world: HitableList = HitableList {
-        hitable: vec![
+    let mut world: HitableList = HitableList {
+         hitable:  vec![
             HitableEnum::SphereE(Sphere::new(
                 Vec3::new(0.0, 0.0, -1.0),
                 0.5,
@@ -85,12 +45,77 @@ fn render(img: &mut [u8]) {
                 MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(-1.0, 0.0, -1.0),
+                Vec3::new(-1.0, 0.0, -0.9),
                 -0.45,
                 MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
         ],
     };
+    let mut window: PistonWindow = WindowSettings::new("Raytrace?", [W as u32, H as u32])
+        .exit_on_esc(true)
+        .build()
+        .unwrap();
+/*
+    image_crate::save_buffer(
+        "buf.png",
+        &buf,
+        W as u32,
+        H as u32,
+        image_crate::ColorType::RGBA(8),
+    )
+    .expect("could not save img");
+*/  
+
+    let mut forward : bool = true;
+
+    window.set_ups(10);
+    window.set_ups_reset(1);
+    let mut tctx = window.create_texture_context();
+    let mut changed = true;
+    let mut texture = None;
+    while let Some(event) = window.next() {
+        //eprintln!("Event: {:?}", event);
+        if let Event::Loop(Loop::Update(args)) = event {
+            eprintln!("Loop::Update args: {:?}", args);
+            changed = true;
+        }
+        if changed {
+            let start = std::time::Instant::now();
+            let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
+            world = animate(world,&mut forward);
+            render(&mut buf,&world);
+            let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+            texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
+            eprintln!("Rendering {}x{}@{} pixel took {:?}", W, H, NS, start.elapsed());
+            changed = false;
+        }
+        window.draw_2d(&event, |context, graphics,_| {
+            clear([1.0, 0.0, 0.5, 1.0], graphics);
+            image(texture.as_ref().expect("rendered texture"), context.transform, graphics)
+        });
+    }
+}
+fn animate(world:HitableList,forward: &mut bool)-> HitableList{
+    let mut world_new = world.clone();
+    let buf = &world.hitable[4];
+    match buf{
+        HitableEnum::SphereE(sph) => {
+            if sph.center.x() > 1.0{
+               *forward = false; 
+            }else if sph.center.x() < -1.0{
+                *forward = true;
+            }
+            if *forward{
+                world_new.hitable[4] = HitableEnum::SphereE(Sphere::new(Vec3::new(sph.center.x() +0.01, sph.center.y(), sph.center.z()), sph.radius, sph.mat));
+            }else{
+                world_new.hitable[4] = HitableEnum::SphereE(Sphere::new(Vec3::new(sph.center.x() -0.01, sph.center.y(), sph.center.z()), sph.radius, sph.mat));
+            }
+
+        }
+    }
+    world_new
+}
+fn render(img: &mut [u8],world: &HitableList) {
     let cam = Camera::std();
     for x in 0..W {
         // if x % (W / 10) == 0 {
@@ -119,7 +144,7 @@ fn color(r: &Ray, world: &HitableList, depth: u32) -> Vec3 {
         let mut attunation: Vec3 = Vec3::new(0.0, 0.0, 0.0);
         let scattered = hit_record.material.scatter(r, &hit_record, &mut attunation);
         match scattered {
-            Some(ref r2) if depth < 50 => {
+            Some(ref r2) if depth < MAX_DEPTH => {
                 return attunation * color(&r2, &world, depth + 1);
             }
             _ => {

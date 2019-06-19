@@ -12,7 +12,7 @@ pub struct HitRecord {
 pub trait Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
-#[derive(Debug)]
+#[derive(Debug,Clone,Copy)]
 pub enum HitableEnum {
     SphereE(Sphere),
 }

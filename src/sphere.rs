@@ -3,7 +3,7 @@ use crate::material::MaterialEnum;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use rand::prelude::*;
-#[derive(Debug)]
+#[derive(Debug,Clone,Copy)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
