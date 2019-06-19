@@ -19,43 +19,43 @@ use piston_window::{
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
-const W: usize = 640;
-const H: usize = 480;
-const NS: usize = 5;
+const W: usize = 400;
+const H: usize = 400;
+const NS: usize = 2;
 const MAX_DEPTH: u32 = 50;
 fn main() {
     let mut world: HitableList = HitableList {
         hitable: vec![
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(0.0, 0.0, -1.0),
+                Vec3::new(0.0, 0.0, 0.0),
                 0.5,
                 MaterialEnum::Lambertian(Lambertian::new(0.8, 0.3, 0.3)),
             )),
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(0.0, 100.5, -1.0),
+                Vec3::new(0.0, 100.5, 0.0),
                 100.0,
                 MaterialEnum::Lambertian(Lambertian::new(0.8, 0.8, 0.0)),
             )),
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(1.0, 0.0, -1.0),
+                Vec3::new(1.0, 0.0, 0.0),
                 0.5,
                 MaterialEnum::Metal(Metal::new(0.8, 0.6, 0.2, 1.0)),
             )),
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(-1.0, 0.0, -1.0),
+                Vec3::new(-1.0, 0.0, 0.0),
                 0.5,
                 MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
             HitableEnum::SphereE(Sphere::new(
-                Vec3::new(-1.0, 0.0, -0.9),
-                -0.5,
+                Vec3::new(-1.0, 0.0, 0.0),
+                -0.45,
                 MaterialEnum::Dielectric(Dielectric::new(1.5)),
             )),
         ],
     };
     let mut cam = Camera::new(
         Vec3::new(-2.0, -2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         90.0,
         (W as f64) / (H as f64),
@@ -76,7 +76,7 @@ fn main() {
     */
 
     let mut forward: bool = true;
-
+    let mut angle: f64 = 0.0;
     window.set_ups(10);
     window.set_ups_reset(1);
     let mut tctx = window.create_texture_context();
@@ -91,7 +91,7 @@ fn main() {
         if changed {
             let start = std::time::Instant::now();
             let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-            animate(&mut world, &mut forward, &mut cam);
+            animate(&mut world, &mut forward, &mut cam, &mut angle);
             render(&mut buf, &world, &cam);
             let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
@@ -114,7 +114,7 @@ fn main() {
         });
     }
 }
-fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera) {
+fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle: &mut f64) {
     let buf = &mut world.hitable[4];
     match buf {
         HitableEnum::SphereE(ref mut sph) => {
@@ -145,13 +145,15 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera) {
             }
         }
     }
+    let rad: f64 = *angle * std::f64::consts::PI / 180.0;
     *cam = Camera::new(
-        cam.origin + Vec3::new(0.1, 0.0, 0.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(rad.cos() * 2.0, -2.0, rad.sin() * 2.0),
+        Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         90.0,
         (W as f64) / (H as f64),
     );
+    *angle += 1.0;
 }
 fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
     for x in 0..W {
