@@ -14,7 +14,7 @@ use hitable::HitableEnum;
 use hitable_list::HitableList;
 use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
 use piston_window::{
-    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,text,Transformed
+    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,Transformed
 };
 use rayon::prelude::*;
 use ray::Ray;
@@ -106,14 +106,15 @@ fn main() {
             );
             changed = false;
         }
-        window.draw_2d(&event, |context, graphics, _| {
+        window.draw_2d(&event, |context, graphics, device| {
             clear([1.0, 0.0, 0.5, 1.0], graphics);
             image(
                 texture.as_ref().expect("rendered texture"),
                 context.transform,
                 graphics,
             );
-            piston_window::text::Text::new_color([0.0,0.0,0.0,1.0],18).draw(&info_text, &mut font,&piston_window::draw_state::DrawState::default(),context.transform.trans(12.0,18.0),graphics).expect("draw info text");
+            piston_window::text::Text::new_color([0.0,0.0,0.0,1.0],10).draw(&info_text, &mut font,&piston_window::draw_state::DrawState::default(),context.transform.trans(12.0,18.0),graphics).expect("draw info text");
+            font.factory.encoder.flush(device);
         });
     }
 }
