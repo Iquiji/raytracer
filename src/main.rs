@@ -14,10 +14,11 @@ use hitable::HitableEnum;
 use hitable_list::HitableList;
 use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
 use piston_window::{
-    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,Transformed
+    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, Transformed,
+    WindowSettings,
 };
-use rayon::prelude::*;
 use ray::Ray;
+use rayon::prelude::*;
 use sphere::Sphere;
 use vec3::Vec3;
 const W: usize = 400;
@@ -83,7 +84,9 @@ fn main() {
     let mut tctx = window.create_texture_context();
     let mut changed = true;
     let mut texture = None;
-    let mut font = window.load_font("FantasqueSansMono-Regular.ttf").expect("font not found");
+    let mut font = window
+        .load_font("FantasqueSansMono-Regular.ttf")
+        .expect("font not found");
     //font.preload_printable_ascii(12).expect("couldnt load printable ascii");
     let mut info_text: String = "".to_owned();
     while let Some(event) = window.next() {
@@ -113,7 +116,15 @@ fn main() {
                 context.transform,
                 graphics,
             );
-            piston_window::text::Text::new_color([0.0,0.0,0.0,1.0],10).draw(&info_text, &mut font,&piston_window::draw_state::DrawState::default(),context.transform.trans(12.0,18.0),graphics).expect("draw info text");
+            piston_window::text::Text::new_color([0.0, 0.0, 0.0, 1.0], 10)
+                .draw(
+                    &info_text,
+                    &mut font,
+                    &piston_window::draw_state::DrawState::default(),
+                    context.transform.trans(12.0, 18.0),
+                    graphics,
+                )
+                .expect("draw info text");
             font.factory.encoder.flush(device);
         });
     }
@@ -160,23 +171,25 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle:
     *angle += 1.0;
 }
 fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
-    img.par_chunks_mut(W*4).enumerate().for_each(|(y,chunk)|{
-        for x in 0..W {
-            let mut col = Vec3::new(0.0, 0.0, 0.0);
-            let mut rng = rand::thread_rng();
-            for _ in 0..NS {
-                let u = (x as f64 + rng.gen::<f64>()) / W as f64;
-                let v = (y as f64 + rng.gen::<f64>()) / H as f64;
-                let r: Ray = cam.get_ray(u, v);
-                col += color(&r, &world, 0);
+    img.par_chunks_mut(W * 4)
+        .enumerate()
+        .for_each(|(y, chunk)| {
+            for x in 0..W {
+                let mut col = Vec3::new(0.0, 0.0, 0.0);
+                let mut rng = rand::thread_rng();
+                for _ in 0..NS {
+                    let u = (x as f64 + rng.gen::<f64>()) / W as f64;
+                    let v = (y as f64 + rng.gen::<f64>()) / H as f64;
+                    let r: Ray = cam.get_ray(u, v);
+                    col += color(&r, &world, 0);
+                }
+                col /= NS as f64;
+                col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
+                chunk[x * 4] = (255.0 * col.r()) as u8;
+                chunk[x * 4 + 1] = (255.0 * col.g()) as u8;
+                chunk[x * 4 + 2] = (255.0 * col.b()) as u8;
             }
-            col /= NS as f64;
-            col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
-            chunk[x * 4] = (255.0 * col.r()) as u8;
-            chunk[x * 4 + 1] = (255.0 * col.g()) as u8;
-            chunk[x * 4 + 2] = (255.0 * col.b()) as u8;
-        }
-    })
+        })
 }
 fn color(r: &Ray, world: &HitableList, depth: u32) -> Vec3 {
     let rec = world.hit(&r, 0.001, std::f64::MAX);
