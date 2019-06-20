@@ -14,7 +14,7 @@ use hitable::HitableEnum;
 use hitable_list::HitableList;
 use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
 use piston_window::{
-    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,
+    clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,text,Transformed
 };
 use rayon::prelude::*;
 use ray::Ray;
@@ -83,6 +83,9 @@ fn main() {
     let mut tctx = window.create_texture_context();
     let mut changed = true;
     let mut texture = None;
+    let mut font = window.load_font("FantasqueSansMono-Regular.ttf").expect("font not found");
+    //font.preload_printable_ascii(12).expect("couldnt load printable ascii");
+    let mut info_text: String = "".to_owned();
     while let Some(event) = window.next() {
         if let Event::Loop(Loop::Update(_args)) = event {
             changed = true;
@@ -94,7 +97,7 @@ fn main() {
             render(&mut buf, &world, &cam);
             let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
-            eprintln!(
+            info_text = format!(
                 "Rendering {}x{}@{} pixel took {:?}ms",
                 W,
                 H,
@@ -109,7 +112,8 @@ fn main() {
                 texture.as_ref().expect("rendered texture"),
                 context.transform,
                 graphics,
-            )
+            );
+            piston_window::text::Text::new_color([0.0,0.0,0.0,1.0],18).draw(&info_text, &mut font,&piston_window::draw_state::DrawState::default(),context.transform.trans(12.0,18.0),graphics).expect("draw info text");
         });
     }
 }
