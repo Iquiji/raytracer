@@ -16,6 +16,7 @@ use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
 use piston_window::{
     clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, WindowSettings,
 };
+use rayon::prelude::*;
 use ray::Ray;
 use sphere::Sphere;
 use vec3::Vec3;
@@ -77,15 +78,13 @@ fn main() {
 
     let mut forward: bool = true;
     let mut angle: f64 = 0.0;
-    window.set_ups(10);
+    window.set_ups(60);
     window.set_ups_reset(1);
     let mut tctx = window.create_texture_context();
     let mut changed = true;
     let mut texture = None;
     while let Some(event) = window.next() {
-        //eprintln!("Event: {:?}", event);
-        if let Event::Loop(Loop::Update(args)) = event {
-            eprintln!("Loop::Update args: {:?}", args);
+        if let Event::Loop(Loop::Update(_args)) = event {
             changed = true;
         }
         if changed {
@@ -96,11 +95,11 @@ fn main() {
             let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
             eprintln!(
-                "Rendering {}x{}@{} pixel took {:?}",
+                "Rendering {}x{}@{} pixel took {:?}ms",
                 W,
                 H,
                 NS,
-                start.elapsed()
+                start.elapsed().as_millis()
             );
             changed = false;
         }
@@ -156,11 +155,8 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle:
     *angle += 1.0;
 }
 fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
-    for x in 0..W {
-        // if x % (W / 10) == 0 {
-        //     println!("{}%", (x as f64 / W as f64) * 100.0);
-        // }
-        for y in 0..H {
+    img.par_chunks_mut(W*4).enumerate().for_each(|(y,chunk)|{
+        for x in 0..W {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
             let mut rng = rand::thread_rng();
             for _ in 0..NS {
@@ -171,11 +167,11 @@ fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
             }
             col /= NS as f64;
             col = Vec3::new(col.r().sqrt(), col.g().sqrt(), col.b().sqrt());
-            img[(x + y * W) * 4] = (255.0 * col.r()) as u8;
-            img[(x + y * W) * 4 + 1] = (255.0 * col.g()) as u8;
-            img[(x + y * W) * 4 + 2] = (255.0 * col.b()) as u8;
+            chunk[x * 4] = (255.0 * col.r()) as u8;
+            chunk[x * 4 + 1] = (255.0 * col.g()) as u8;
+            chunk[x * 4 + 2] = (255.0 * col.b()) as u8;
         }
-    }
+    })
 }
 fn color(r: &Ray, world: &HitableList, depth: u32) -> Vec3 {
     let rec = world.hit(&r, 0.001, std::f64::MAX);
