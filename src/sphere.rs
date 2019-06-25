@@ -18,10 +18,9 @@ impl Sphere {
         }
     }
     pub fn random_in_unit_sphere() -> Vec3 {
-        let mut p: Vec3;
         let mut rng = rand::thread_rng();
         loop {
-            p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>()) * 2.0
+            let p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>()) * 2.0
                 - Vec3::new(1.0, 1.0, 1.0);
             if p.len_sq() >= 1.0 {
                 continue;
