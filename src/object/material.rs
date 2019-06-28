@@ -1,7 +1,7 @@
-use crate::hitable::HitRecord;
-use crate::ray::Ray;
-use crate::sphere::Sphere;
-use crate::vec3::Vec3;
+use crate::math::ray::Ray;
+use crate::math::vec3::Vec3;
+use crate::object::hitable::HitRecord;
+use crate::object::sphere::Sphere;
 use rand::prelude::*;
 pub trait Material {
     fn scatter(&self, r: &Ray, rec: &HitRecord, attunuation: &mut Vec3) -> Option<Ray>;

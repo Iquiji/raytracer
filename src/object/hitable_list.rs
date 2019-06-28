@@ -1,7 +1,7 @@
-use crate::hitable::{HitRecord, Hitable, HitableEnum};
-use crate::material::{MaterialEnum, Metal};
-use crate::ray::Ray;
-use crate::vec3::Vec3;
+use crate::math::ray::Ray;
+use crate::math::vec3::Vec3;
+use crate::object::hitable::{HitRecord, Hitable, HitableEnum};
+use crate::object::material::{MaterialEnum, Metal};
 
 #[derive(Debug, Clone)]
 pub struct HitableList {

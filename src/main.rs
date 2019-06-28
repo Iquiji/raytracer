@@ -1,30 +1,25 @@
 #![warn(clippy::all)]
 extern crate image as image_crate;
 use rand::prelude::*;
-mod camera;
-mod hitable;
-mod hitable_list;
-mod material;
-mod ray;
-mod sphere;
-mod vec3;
-use crate::hitable::Hitable;
-use camera::Camera;
-use hitable::HitableEnum;
-use hitable_list::HitableList;
-use material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
+mod graphics;
+mod math;
+mod object;
+use graphics::camera::Camera;
+use math::ray::Ray;
+use math::vec3::Vec3;
+use object::hitable::{Hitable, HitableEnum};
+use object::hitable_list::HitableList;
+use object::material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
+use object::sphere::Sphere;
 use piston_window::{
     clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, Transformed,
     WindowSettings,
 };
-use ray::Ray;
 use rayon::prelude::*;
-use sphere::Sphere;
-use vec3::Vec3;
-const W: usize = 400;
-const H: usize = 400;
-const NS: usize = 2;
-const MAX_DEPTH: u32 = 50;
+const W: usize = 600;
+const H: usize = 600;
+const NS: usize = 10;
+const MAX_DEPTH: u32 = 5;
 fn main() {
     let mut world: HitableList = HitableList {
         hitable: vec![

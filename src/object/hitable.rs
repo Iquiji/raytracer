@@ -1,7 +1,7 @@
-use crate::material::MaterialEnum;
-use crate::ray::Ray;
-use crate::sphere::Sphere;
-use crate::vec3::Vec3;
+use crate::math::ray::Ray;
+use crate::math::vec3::Vec3;
+use crate::object::material::MaterialEnum;
+use crate::object::sphere::Sphere;
 
 #[derive(Debug, Clone, Copy)]
 pub struct HitRecord {

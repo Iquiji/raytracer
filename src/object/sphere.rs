@@ -1,7 +1,7 @@
-use crate::hitable::{HitRecord, Hitable};
-use crate::material::MaterialEnum;
-use crate::ray::Ray;
-use crate::vec3::Vec3;
+use crate::math::ray::Ray;
+use crate::math::vec3::Vec3;
+use crate::object::hitable::{HitRecord, Hitable};
+use crate::object::material::MaterialEnum;
 use rand::prelude::*;
 #[derive(Debug, Clone)]
 pub struct Sphere {
