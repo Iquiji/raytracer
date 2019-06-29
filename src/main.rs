@@ -13,7 +13,7 @@ use object::material::{Dielectric, Lambertian, Material, MaterialEnum, Metal};
 use object::sphere::Sphere;
 use piston_window::{
     clear, image, Event, EventLoop, Loop, PistonWindow, Texture, TextureSettings, Transformed,
-    WindowSettings,
+    WindowSettings,Window,
 };
 use rayon::prelude::*;
 const W: usize = 600;
@@ -90,15 +90,16 @@ fn main() {
         }
         if changed {
             let start = std::time::Instant::now();
-            let mut buf: Vec<u8> = vec![255; (W * H * 4) as usize];
-            animate(&mut world, &mut forward, &mut cam, &mut angle);
-            render(&mut buf, &world, &cam);
-            let img = image_crate::ImageBuffer::from_vec(W as u32, H as u32, buf).unwrap();
+            let window_size = window.size();
+            let mut buf: Vec<u8> = vec![255; (window_size.width * window_size.height * 4.0) as usize];
+            animate(&mut world, &mut forward, &mut cam, &mut angle,window_size);
+            render(&mut buf, &world, &cam,window_size);
+            let img = image_crate::ImageBuffer::from_vec(window_size.width as u32,window_size.height as u32, buf).unwrap();
             texture = Texture::from_image(&mut tctx, &img, &TextureSettings::new()).ok();
             info_text = format!(
                 "Rendering {}x{}@{} pixel took {:?}ms",
-                W,
-                H,
+                window_size.width,
+                window_size.height,
                 NS,
                 start.elapsed().as_millis()
             );
@@ -108,7 +109,7 @@ fn main() {
             clear([1.0, 0.0, 0.5, 1.0], graphics);
             image(
                 texture.as_ref().expect("rendered texture"),
-                context.transform,
+                context.transform.scale(1.0,1.0),
                 graphics,
             );
             piston_window::text::Text::new_color([0.0, 0.0, 0.0, 1.0], 10)
@@ -124,7 +125,7 @@ fn main() {
         });
     }
 }
-fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle: &mut f64) {
+fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle: &mut f64,window_size: piston_window::Size) {
     let buf = &mut world.hitable[4];
     match buf {
         HitableEnum::SphereE(ref mut sph) => {
@@ -161,20 +162,20 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle:
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         90.0,
-        (W as f64) / (H as f64),
+        (window_size.width as f64) / (window_size.height as f64),
     );
     *angle += 1.0;
 }
-fn render(img: &mut [u8], world: &HitableList, cam: &Camera) {
-    img.par_chunks_mut(W * 4)
+fn render(img: &mut [u8], world: &HitableList, cam: &Camera,window_size: piston_window::Size) {
+    img.par_chunks_mut((window_size.width * 4.0) as usize)
         .enumerate()
         .for_each(|(y, chunk)| {
-            for x in 0..W {
+            for x in 0..window_size.width as usize {
                 let mut col = Vec3::new(0.0, 0.0, 0.0);
                 let mut rng = rand::thread_rng();
                 for _ in 0..NS {
-                    let u = (x as f64 + rng.gen::<f64>()) / W as f64;
-                    let v = (y as f64 + rng.gen::<f64>()) / H as f64;
+                    let u = (x as f64 + rng.gen::<f64>()) / window_size.width as f64;
+                    let v = (y as f64 + rng.gen::<f64>()) / window_size.height as f64;
                     let r: Ray = cam.get_ray(u, v);
                     col += color(&r, &world, 0);
                 }
