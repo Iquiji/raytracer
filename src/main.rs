@@ -157,13 +157,7 @@ fn animate(world: &mut HitableList, forward: &mut bool, cam: &mut Camera, angle:
         }
     }
     let rad: f64 = *angle * std::f64::consts::PI / 180.0;
-    *cam = Camera::new(
-        Vec3::new(rad.cos() * 2.0, -2.0, rad.sin() * 2.0),
-        Vec3::new(0.0, 0.0, 0.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        90.0,
-        (window_size.width as f64) / (window_size.height as f64),
-    );
+    *cam = cam.mv(-cam.lookfrom + Vec3::new(rad.cos() * 2.0, -2.0, rad.sin() * 2.0), (window_size.width as f64)/(window_size.height as f64));
     *angle += 1.0;
 }
 fn render(img: &mut [u8], world: &HitableList, cam: &Camera,window_size: piston_window::Size) {

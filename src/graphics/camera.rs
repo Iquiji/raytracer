@@ -5,6 +5,11 @@ pub struct Camera {
     pub lower_left_corner: Vec3,
     pub horizontal: Vec3,
     pub vertical: Vec3,
+    pub lookfrom: Vec3,
+    pub lookat: Vec3,
+    pub vup: Vec3,
+    pub vfov: f64,
+    pub aspect: f64,
 }
 impl Camera {
     // pub fn std() -> Self {
@@ -33,6 +38,14 @@ impl Camera {
             horizontal: u * half_width * 2.0,
             vertical: v * half_height * 2.0,
             origin: lookfrom,
+            lookfrom,
+            lookat,
+            vup,
+            vfov,
+            aspect,
         }
+    }
+    pub fn mv(&self,mv_vec: Vec3,aspect: f64) -> Self{
+        Self::new(self.lookfrom + mv_vec,self.lookat,self.vup,self.vfov,aspect)
     }
 }
